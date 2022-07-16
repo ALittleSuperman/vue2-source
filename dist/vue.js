@@ -39,11 +39,69 @@
     return Constructor;
   }
 
+  // 重写数组中的部分函数
+  // 获取数组的原型
+  var oldArrayProto = Array.prototype; // 创建新原型，修改新原型函数，不会影响原生函数
+
+  var newArrayProto = Object.create(oldArrayProto); // 以下函数会改变原数组
+
+  var method = ["push", "pop", "shift", "unshift", "revers", "sort", "splice"];
+  method.forEach(function (method) {
+    newArrayProto[method] = function () {
+      var _oldArrayProto$method;
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      // 重写数组的方法，内部调用原来的函数
+      var result = (_oldArrayProto$method = oldArrayProto[method]).call.apply(_oldArrayProto$method, [this].concat(args)); // 保存修改数组的数据
+
+
+      var inserted;
+      var ob = this.__ob__;
+
+      switch (method) {
+        case "push":
+        case "unshift":
+          inserted = args;
+          break;
+
+        case "spice":
+          inserted = args.slice(2);
+      }
+
+      console.log(inserted);
+
+      if (inserted) {
+        // 将新数据进行劫持
+        ob.observeArray(inserted);
+      }
+
+      return result;
+    };
+  });
+
   var Observe = /*#__PURE__*/function () {
     function Observe(data) {
       _classCallCheck(this, Observe);
 
-      this.walk(data);
+      // 添加属性偏于数据监听，并且如果数据上有__ob__属性说明已经被观测过
+      // 将__ob__设置成不可枚举，防止将大当成object循环劫持
+      Object.defineProperty(data, '__ob__', {
+        value: this,
+        enumerable: false
+      }); // 数组不使用劫持函数，因为数组的数量是不固定的，循环起来消耗性能
+      // 重写数组的7个修改数组本身的函数
+
+      if (Array.isArray(data)) {
+        // 对数组中的object数据类型进行劫持
+        data.__proto__ = newArrayProto;
+        this.observeArray(data);
+      } else {
+        // 不是数组进行劫持
+        this.walk(data);
+      }
     }
     /**
      * 循环对象,依次劫持
@@ -56,6 +114,18 @@
       value: function walk(data) {
         Object.keys(data).forEach(function (key) {
           return defineReactive(data, key, data[key]);
+        });
+      }
+      /**
+       * 劫持数组中的object类型数据
+       * @param data
+       */
+
+    }, {
+      key: "observeArray",
+      value: function observeArray(data) {
+        data.forEach(function (item) {
+          return observe(item);
         });
       }
     }]);
@@ -86,6 +156,8 @@
   }
   function observe(data) {
     if (_typeof(data) !== 'object' || data === null) return; // 如果已经被劫持过，那就不需要劫持了
+
+    if (data.__ob__ instanceof Observe) return data.__ob__; // 如果数据上有__ob__属性说明已经被劫持过
 
     return new Observe(data);
   }
