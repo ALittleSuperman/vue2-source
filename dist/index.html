@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="./vue.js"></script>
+<script>
+    const vm = new Vue({
+        data() {
+            return {
+                a: 1,
+                b: {
+                    a: 1
+                }
+            }
+        }
+    })
+    console.log(vm.b.a)
+</script>
+</body>
+</html>
