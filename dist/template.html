@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    {{name}}:{{age}}
+</div>
+<script src="./vue.js"></script>
+<script>
+    const vm = new Vue({
+        data() {
+            return {
+                name: "lyz",
+                age: 24
+            }
+        },
+        template: "<div id='app'>{{name}}:{{age}}</div>",
+        el: "#app"
+    })
+    // 1。模版引擎：使用正则匹配模版，每次更新替换模版，性能太差
+    // 2。虚拟dom:数据变化后比较虚拟dom的差异，确定更新的最小视图
+</script>
+</body>
+</html>

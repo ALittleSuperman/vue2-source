@@ -1,4 +1,4 @@
-import {observe} from "./observe/index";
+import {observe} from "./observe";
 
 export function initState(vm) {
     const opts = vm.$options // 获取所有选项
