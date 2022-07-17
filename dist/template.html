@@ -5,8 +5,10 @@
     <title>Title</title>
 </head>
 <body>
-<div id="app">
-    {{name}}:{{age}}
+<div id="app" tabindex = "-1">
+    <div style="color: red">{{name}}</div>
+    <br/>
+    <div>{{age}}</div>
 </div>
 <script src="./vue.js"></script>
 <script>
@@ -17,7 +19,6 @@
                 age: 24
             }
         },
-        template: "<div id='app'>{{name}}:{{age}}</div>",
         el: "#app"
     })
     // 1。模版引擎：使用正则匹配模版，每次更新替换模版，性能太差
